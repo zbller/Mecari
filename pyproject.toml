@@ -5,18 +5,13 @@ description = "Japanese morphological analysis using Graph Neural Networks"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
-    # PyTorch core (2.2.x)
     "torch>=2.2,<2.3",
-    # Lightning trainer
     "pytorch-lightning>=2.0.0",
-    # PyTorch Geometric
     "torch-geometric>=2.4,<2.5",
-    # Core utilities
     "numpy>=1.24,<2.0",
     "pyyaml>=6.0",
     "tqdm>=4.65.0",
-    # KWDLC前処理でKNPを読むために必須
-    "kyoto-reader>=6.0.3",
+    "kyoto-reader>=2.5.0",
     # Optional: enabled by default via config
     "wandb>=0.15.0",
 ]
