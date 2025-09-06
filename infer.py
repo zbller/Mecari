@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Show immediate feedback from the moment the command starts
+print("Loading model...", flush=True)
+
 import os
 import random
 from typing import Any, Dict, Optional, Tuple
@@ -182,7 +185,11 @@ def _load_model_from_state(config_path: str, state_path: str):
     model = _instantiate_model_from_config(config)
     state = torch.load(state_path, map_location="cpu")
     # Lightning checkpoints saved via export may store under 'state_dict' already
-    if isinstance(state, dict) and "state_dict" in state and all(k.startswith("model.") for k in state["state_dict"].keys()):
+    if (
+        isinstance(state, dict)
+        and "state_dict" in state
+        and all(k.startswith("model.") for k in state["state_dict"].keys())
+    ):
         state = state["state_dict"]
     # Remove potential 'model.' prefix if present (depends on save path)
     new_state = {}

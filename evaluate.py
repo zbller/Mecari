@@ -207,8 +207,6 @@ def main():
 
     print(f"Evaluating: {len(test_ids)} files")
 
-    # Load model
-    print("\nLoading trained model...")
     import infer
 
     model_info = infer.load_model(experiment_name=args.experiment)
