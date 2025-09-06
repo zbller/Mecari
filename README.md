@@ -6,7 +6,11 @@
 
 Mecari [1] is a GNN‑based Japanese morphological analyzer. It supports training from partially annotated graphs (only '+'/'-' where available; '?' is ignored) and aims for fast training and inference.
 
-![Overview](abst.png)
+<p align="center">
+  <img src="abst.png" alt="Overview" width="70%" />
+  <!-- Adjust width (e.g., 60%, 50%, or px) as desired -->
+  
+</p>
 
 ### Graph
 The graph is built from MeCab morpheme candidates.
