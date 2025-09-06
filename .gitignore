@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+.venv
+
+annotations*/
+experiments/
+lightning_logs/
+cache/
+results/
+
+KWDLC/
