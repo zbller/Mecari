@@ -1,0 +1,11 @@
+features:
+  lexical_feature_dim: 100000
+
+training:
+  deterministic: false
+  annotations_dir: "annotations"
+  project_name: "mecari"
+
+inference:
+  checkpoint_dir: "experiments"
+  experiment_name: null

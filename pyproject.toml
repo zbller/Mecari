@@ -1,0 +1,61 @@
+[project]
+name = "mecari-morpheme"
+version = "0.1.0"
+description = "Japanese morphological analysis using Graph Neural Networks"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    # PyTorch core (2.2.x)
+    "torch>=2.2,<2.3",
+    # Lightning trainer
+    "pytorch-lightning>=2.0.0",
+    # PyTorch Geometric
+    "torch-geometric>=2.4,<2.5",
+    # Core utilities
+    "numpy>=1.24,<2.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.65.0",
+    # KWDLC前処理でKNPを読むために必須
+    "kyoto-reader>=6.0.3",
+    # Optional: enabled by default via config
+    "wandb>=0.15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipython>=8.14.0",
+    "jupyter>=1.0.0",
+    "notebook>=7.0.0",
+    "pytest>=7.4.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mecari"]
+
+[tool.uv]
+index-url = "https://pypi.org/simple"
+# Use CUDA 12.1 compatible PyG wheels (matches torch 2.2.x + cu121 environment)
+find-links = ["https://data.pyg.org/whl/torch-2.2.0+cu121.html"]
+
+# torch-cluster等のビルド時にtorchが必要
+[tool.uv.extra-build-dependencies]
+# Ensure torch is available when resolving extension wheels
+torch-geometric = ["torch"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]  # line too long
+
+[tool.black]
+line-length = 120
+target-version = ['py311']

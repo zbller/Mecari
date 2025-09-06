@@ -1,0 +1,36 @@
+extends: "base.yaml"
+
+model:
+  type: "gatv2"
+  hidden_dim: 64
+  num_layers: 4
+  num_heads: 4
+  dropout: 0.1
+  num_classes: 1
+  share_weights: false
+
+edge_features:
+  use_bidirectional_edges: true
+
+training:
+  learning_rate: 0.001
+  batch_size: 128
+  max_steps: 10000
+  patience: 10
+  gradient_clip_val: 0.5
+  gradient_clip_algorithm: "norm"
+  num_workers: 4
+  accumulate_grad_batches: 1
+  seed: 42
+  warmup_steps: 500
+  warmup_start_lr: 0.0
+  optimizer:
+    type: "adamw"
+    weight_decay: 0.001
+  use_wandb: true
+  log_every_n_steps: 50
+  val_check_interval: 1.0
+
+loss:
+  use_pos_weight: true
+  label_smoothing: 0.0

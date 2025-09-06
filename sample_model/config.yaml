@@ -1,0 +1,39 @@
+edge_features:
+  use_bidirectional_edges: true
+features:
+  lexical_feature_dim: 100000
+inference:
+  checkpoint_dir: experiments
+  experiment_name: null
+loss:
+  label_smoothing: 0.0
+  use_pos_weight: true
+model:
+  dropout: 0.1
+  hidden_dim: 64
+  num_classes: 1
+  num_heads: 4
+  num_layers: 4
+  share_weights: false
+  type: gatv2
+training:
+  accumulate_grad_batches: 1
+  annotations_dir: annotations_new
+  batch_size: 128
+  deterministic: false
+  gradient_clip_algorithm: norm
+  gradient_clip_val: 0.5
+  learning_rate: 0.001
+  log_every_n_steps: 50
+  max_steps: 10000
+  num_workers: 4
+  optimizer:
+    type: adamw
+    weight_decay: 0.001
+  patience: 10
+  project_name: mecari
+  seed: 42
+  use_wandb: true
+  val_check_interval: 1.0
+  warmup_start_lr: 0.0
+  warmup_steps: 500
