@@ -1,20 +1,14 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 --find-links https://data.pyg.org/whl/torch-2.2.0+cpu.html
 
-# Core runtime
+# Pin to NumPy 1.x to avoid ABI issues on Spaces
+numpy<2
+
+# CPU PyTorch and compatible PyG
 torch==2.2.2
-torch-scatter
-torch-sparse
-torch-cluster
-torch-spline-conv
-torch-geometric==2.4.0
-pytorch-lightning==2.5.2
-numpy>=1.24,<2.1
-pyyaml>=6.0
-tqdm>=4.65.0
-kyoto-reader>=2.5.0
+torch-geometric==2.4.*
 
-# UI
-gradio>=4.37.0
+# Project runtime deps
+pyyaml>=6
+tqdm>=4.65
 
-# Optional logger (disabled at runtime)
-wandb>=0.15.0

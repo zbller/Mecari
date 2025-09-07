@@ -82,6 +82,14 @@ source .venv/bin/activate
 uv sync
 ```
 
+### Running on Hugging Face Spaces (CPU)
+- Use Python 3.11 in Space settings (or metadata).
+- Add `requirements.txt` and `packages.txt` from this repo to the Space root.
+  - `requirements.txt` pins `numpy<2` and CPU wheels for PyTorch 2.2.x and PyG.
+  - `packages.txt` installs MeCab and JUMANDIC via apt.
+- Rebuild the Space and verify:
+  - `python -c "import numpy, torch; print(numpy.__version__, torch.__version__)"` shows NumPy 1.26.x and Torch 2.2.x.
+
 ## Quickstart (Morphological analysis)
 
 ```bash
