@@ -129,8 +129,8 @@ python evaluate.py --max-samples 50 \
 CC BY‑NC 4.0 (non‑commercial use only)
 
 ## Acknowledgments
-- [1] “Data processing for Japanese text‑to‑pronunciation models”, Gleb Mazovetskiy, Taku Kudo, NLP2024 Workshop on Japanese Language Resources, URL: https://jedworkshop.github.io/JLR2024/materials/b-2.pdf (pp. 19–23)
-- [2] "HOW ATTENTIVE ARE GRAPH ATTENTION NETWORKS?.", Graph architecture: Brody, Shaked, Uri Alon, and Eran Yahav, 10th International Conference on Learning Representations, ICLR 2022. 2022.
+- [1] “Data processing for Japanese text‑to‑pronunciation models”, Gleb Mazovetskiy, Taku Kudo, NLP2024 Workshop on Japanese Language Resources, JLR2024, URL: https://jedworkshop.github.io/JLR2024/materials/b-2.pdf (pp. 19–23)
+- [2] "HOW ATTENTIVE ARE GRAPH ATTENTION NETWORKS?.", Shaked Brody, Uri Alon, and Eran Yahav, 10th International Conference on Learning Representations, ICLR 2022.
 
 ## Disclaimer
 - Independent academic implementation for educational and research purposes.
