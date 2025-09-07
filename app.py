@@ -149,16 +149,40 @@ with gr.Blocks(theme=gr.themes.Soft(), css=FONT_CSS) as demo:
         """
     # Mecari Morpheme Analyzer
 
-    GNNベースの形態素解析器"Mecari"のデモです。github: https://github.com/zbller/Mecari
+    形態素解析器"Mecari"のデモです。Googleが発表した手法の非公式再現実装です。GitHub: https://github.com/zbller/Mecari
     """
     )
 
     with gr.Row():
-        inp = gr.Textbox(label="テキスト入力", value="とうきょうに行った", placeholder="とうきょうに行った", lines=3)
+        inp = gr.Textbox(label="テキスト入力", value="外国人参政権", placeholder="とうきょうに行った", lines=3)
     btn = gr.Button("解析する")
     with gr.Row():
         out_mecari = gr.Textbox(label="Mecari", lines=10)
         out_mecab = gr.Textbox(label="MeCab（Jumandic）", lines=10)
+    gr.Examples(
+        examples=[
+            ["とうきょうに行った"],
+            ["吾輩わがはいは猫である。名前はまだ無い。"]
+        ],
+        inputs=inp,
+        outputs=[out_mecari, out_mecab],
+        fn=analyze,
+        label="Good examples",
+        run_on_click=True,
+        cache_examples=False,
+    )
+    gr.Examples(
+        examples=[
+            ["すもももももももものうち"],
+            ["こちら葛飾区亀有公園前派出所"]
+        ],
+        inputs=inp,
+        outputs=[out_mecari, out_mecab],
+        fn=analyze,
+        label="Bad examples",
+        run_on_click=True,
+        cache_examples=False,
+    )
     btn.click(fn=analyze, inputs=inp, outputs=[out_mecari, out_mecab])
 
     # Optional warm-up
