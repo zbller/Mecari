@@ -1,0 +1,4 @@
+mecab
+mecab-utils
+libmecab-dev
+mecab-jumandic-utf8

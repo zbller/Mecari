@@ -1,3 +1,14 @@
+---
+title: Mecari Morpheme Analyzer
+emoji: 🧩
+colorFrom: indigo
+colorTo: blue
+sdk: gradio
+sdk_version: 4.37.2
+app_file: app.py
+pinned: false
+---
+
 # Mecari (Japanese Morphological Analysis with Graph Neural Networks)
 
 ## Training
