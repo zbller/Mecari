@@ -42,12 +42,30 @@ class MeCabAnalyzer:
 
     def __init__(
         self,
-        jumandic_path: str = "/var/lib/mecab/dic/juman-utf8",
+        jumandic_path: str | None = None,
         mecab_bin: str | None = None,
     ) -> None:
-        self.jumandic_path = jumandic_path
-        # Allow selecting a specific mecab binary via arg or env var
-        self.mecab_bin = mecab_bin or os.getenv("MECAB_BIN", "mecab")
+        # Prefer JUMANDIC if present; otherwise fall back to IPADIC
+        if jumandic_path is None:
+            candidates = [
+                "/var/lib/mecab/dic/juman-utf8",
+                "/usr/lib/x86_64-linux-gnu/mecab/dic/juman-utf8",
+            ]
+            ipadic_candidates = [
+                "/var/lib/mecab/dic/ipadic",
+                "/usr/lib/x86_64-linux-gnu/mecab/dic/ipadic",
+            ]
+            chosen = next((p for p in candidates if os.path.isdir(p)), None)
+            if chosen is None:
+                chosen = next((p for p in ipadic_candidates if os.path.isdir(p)), None)
+            self.jumandic_path = chosen  # may be None; handled below
+        else:
+            self.jumandic_path = jumandic_path
+
+        # Allow selecting a specific mecab binary via arg or env var; default to common path
+        self.mecab_bin = mecab_bin or os.getenv("MECAB_BIN") or (
+            "/usr/bin/mecab" if os.path.exists("/usr/bin/mecab") else "mecab"
+        )
 
     def version(self) -> str:
         try:
@@ -63,7 +81,11 @@ class MeCabAnalyzer:
             temp_file = f.name
         try:
             fmt = "%pi\t%m\t%H\t%ps\t%pe\n"
-            cmd = [self.mecab_bin, "-d", self.jumandic_path, "-F", fmt, "-E", "", "-a", temp_file]
+            cmd = [self.mecab_bin]
+            # Pass dictionary only if we have a resolvable path
+            if isinstance(self.jumandic_path, str) and os.path.isdir(self.jumandic_path):
+                cmd += ["-d", self.jumandic_path]
+            cmd += ["-F", fmt, "-E", "", "-a", temp_file]
             result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore")
             stdout = result.stdout
         finally:
