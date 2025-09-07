@@ -11,11 +11,12 @@ pinned: false
 
 # Mecari (Japanese Morphological Analysis with Graph Neural Networks)
 
-## Training
+## Demo
+You can try Mecari in https://huggingface.co/spaces/zbller/Mecari
 
-### Overview
+## Overview
 
-Mecari [1] is a GNN‑based Japanese morphological analyzer. It supports training from partially annotated graphs (only '+'/'-' where available; '?' is ignored) and aims for fast training and inference.
+An unofficial implementation of Mecari [1], a GNN‑based Japanese morphological analyzer originally described by Google researchers. It supports training from partially annotated graphs (only '+'/'-' where available; '?' is ignored) and aims for fast training and inference.
 
 <p align="center">
   <img src="abst.png" alt="Overview" width="70%" />
@@ -39,14 +40,15 @@ Nodes are featurized with JUMAN++‑style unigram features, edges are modeled as
 ### Inference
 Use the model’s node scores and run Viterbi to search the optimal non‑overlapping path.
 
-## Results (KWDLC test)
+### Results (KWDLC test)
 
 - Trained model (sample_model): Seg F1 0.9725, POS F1 0.9562
 - MeCab (JUMANDIC) baseline:   Seg F1 0.9677, POS F1 0.9465
 
 The GATv2 model trained with this repository (current code and `configs/gatv2.yaml`) using the official KWDLC split outperforms MeCab on both segmentation and POS accuracy.
 
-## Tested Environment
+## Environmental Setup
+### Tested Environment
 
 - OS: Ubuntu 24.04.3 LTS (Noble Numbat)
 - Python: 3.11.3
@@ -55,7 +57,7 @@ The GATv2 model trained with this repository (current code and `configs/gatv2.ya
 - MeCab (binary): 0.996
 - JUMANDIC: `/var/lib/mecab/dic/juman-utf8`
 
-## MeCab Setup (Ubuntu 24.04)
+### MeCab Setup (Ubuntu 24.04)
 1) Install packages (includes the JUMANDIC dictionary)
 
 ```bash
@@ -70,7 +72,7 @@ mecab -v                       # e.g., mecab of 0.996
 test -d /var/lib/mecab/dic/juman-utf8 && echo "JUMANDIC OK"
 ```
 
-## Project Setup
+### Project Setup
 
 ```bash
 # Install uv if needed
@@ -146,8 +148,8 @@ python evaluate.py --max-samples 50 \
 CC BY‑NC 4.0 (non‑commercial use only)
 
 ## Acknowledgments
-- [1] Technical inspiration: Mecari, a morphological analysis system developed by Google, as described in “Data processing for Japanese text‑to‑pronunciation models” by G. Mazovetskiy and T. Kudo (NLP2024 Workshop on Japanese Language Resources). URL: https://jedworkshop.github.io/JLR2024/materials/b-2.pdf (pp. 19–23)
-- [2] Graph architecture: Brody, Shaked, Uri Alon, and Eran Yahav. "HOW ATTENTIVE ARE GRAPH ATTENTION NETWORKS?." 10th International Conference on Learning Representations, ICLR 2022. 2022.
+- [1] “Data processing for Japanese text‑to‑pronunciation models”, Gleb Mazovetskiy, Taku Kudo, NLP2024 Workshop on Japanese Language Resources, URL: https://jedworkshop.github.io/JLR2024/materials/b-2.pdf (pp. 19–23)
+- [2] "HOW ATTENTIVE ARE GRAPH ATTENTION NETWORKS?.", Graph architecture: Brody, Shaked, Uri Alon, and Eran Yahav, 10th International Conference on Learning Representations, ICLR 2022. 2022.
 
 ## Disclaimer
 - Independent academic implementation for educational and research purposes.

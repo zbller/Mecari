@@ -129,8 +129,7 @@ class MeCabAnalyzer:
             node_id, surface, features, sb, eb = parts[0], parts[1], parts[2], parts[3], parts[4]
             if surface in ("BOS", "EOS"):
                 continue
-            if not surface.strip():
-                continue
+            
             try:
                 start_byte = int(sb)
                 end_byte = int(eb)
@@ -168,4 +167,47 @@ class MeCabAnalyzer:
                 continue
             seen.add(key)
             out.append(m)
+        # Synthesize whitespace nodes for gaps if MeCab didn't output them
+        if text:
+            existing_ws_spans = set()
+            for m in out:
+                surf = m.get("surface", "")
+                if surf.strip() == "":
+                    cs = m.get("start_pos", 0)
+                    ce = m.get("end_pos", 0)
+                    existing_ws_spans.add((cs, ce))
+
+            i = 0
+            n = len(text)
+            while i < n:
+                ch = text[i]
+                if ch.isspace():
+                    j = i + 1
+                    while j < n and text[j].isspace():
+                        j += 1
+                    span = (i, j)
+                    if span not in existing_ws_spans:
+                        ws = text[i:j]
+                        wm = {
+                            "surface": ws,
+                            "pos": "特殊",
+                            "pos_detail1": "空白",
+                            "pos_detail2": "*",
+                            "pos_detail3": "*",
+                            "base_form": "",
+                            "reading": "",
+                            "inflection_type": "*",
+                            "inflection_form": "*",
+                            "start_pos": i,
+                            "end_pos": j,
+                            "annotation": "?",
+                            "node_id": f"WS_{i}_{j}",
+                        }
+                        key = signature_key(wm)
+                        if key not in seen:
+                            seen.add(key)
+                            out.append(wm)
+                    i = j
+                else:
+                    i += 1
         return out
