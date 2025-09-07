@@ -5,7 +5,7 @@ You can try Mecari in https://huggingface.co/spaces/zbller/Mecari
 
 ## Overview
 
-Mecari [1] is Google's GNN(Graph Neural Network)‑based Japanese morphological analyzer. It supports training from partially annotated graphs (only '+'/'-' where available; '?' is ignored) and aims for fast training and inference.
+An unofficial implementation of Mecari [1], a GNN‑based Japanese morphological analyzer originally described by Google researchers. It supports training from partially annotated graphs (only '+'/'-' where available; '?' is ignored) and aims for fast training and inference.
 
 <p align="center">
   <img src="abst.png" alt="Overview" width="70%" />
