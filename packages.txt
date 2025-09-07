@@ -1,4 +1,5 @@
 mecab
 mecab-utils
 libmecab-dev
+mecab-jumandic-utf8
 mecab-ipadic-utf8
