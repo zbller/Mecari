@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 import subprocess
 import tempfile
 from typing import Dict, List
@@ -49,6 +50,7 @@ class MeCabAnalyzer:
         if jumandic_path is None:
             candidates = [
                 "/var/lib/mecab/dic/juman-utf8",
+                "/usr/lib/mecab/dic/juman-utf8",
                 "/usr/lib/x86_64-linux-gnu/mecab/dic/juman-utf8",
             ]
             ipadic_candidates = [
@@ -62,10 +64,23 @@ class MeCabAnalyzer:
         else:
             self.jumandic_path = jumandic_path
 
-        # Allow selecting a specific mecab binary via arg or env var; default to common path
-        self.mecab_bin = mecab_bin or os.getenv("MECAB_BIN") or (
-            "/usr/bin/mecab" if os.path.exists("/usr/bin/mecab") else "mecab"
-        )
+        # Resolve MeCab binary path robustly
+        if mecab_bin:
+            self.mecab_bin = mecab_bin
+        elif os.getenv("MECAB_BIN"):
+            self.mecab_bin = os.getenv("MECAB_BIN")  # type: ignore[assignment]
+        else:
+            resolved = shutil.which("mecab")
+            if resolved:
+                self.mecab_bin = resolved
+            else:
+                for cand in ["/usr/bin/mecab", "/usr/local/bin/mecab", "/bin/mecab"]:
+                    if os.path.exists(cand):
+                        self.mecab_bin = cand
+                        break
+                else:
+                    # Fallback; will be validated at runtime
+                    self.mecab_bin = "mecab"
 
     def version(self) -> str:
         try:
@@ -81,6 +96,13 @@ class MeCabAnalyzer:
             temp_file = f.name
         try:
             fmt = "%pi\t%m\t%H\t%ps\t%pe\n"
+            # Validate mecab binary is available
+            if not (os.path.isabs(self.mecab_bin) and os.path.exists(self.mecab_bin)):
+                if shutil.which(self.mecab_bin) is None:
+                    raise FileNotFoundError(
+                        "MeCab binary not found. Ensure packages.txt installs 'mecab' and set MECAB_BIN if needed."
+                    )
+
             cmd = [self.mecab_bin]
             # Pass dictionary only if we have a resolvable path
             if isinstance(self.jumandic_path, str) and os.path.isdir(self.jumandic_path):
@@ -90,8 +112,6 @@ class MeCabAnalyzer:
             stdout = result.stdout
         finally:
             try:
-                import os
-
                 os.unlink(temp_file)
             except Exception:
                 pass
