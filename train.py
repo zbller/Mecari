@@ -115,14 +115,31 @@ def setup_loggers(config: dict, experiment_name: str):
     return loggers
 
 
-def create_trainer(config: dict, callbacks: list, loggers, deterministic: bool) -> pl.Trainer:
+def _is_gpu_usable() -> bool:
+    """Return True if a CUDA device is actually usable for training.
+
+    torch.cuda.is_available() が True でも、カーネル実行が不可の環境があるため
+    軽いテンソル確保で確認する。
+    """
+    try:
+        if not torch.cuda.is_available():
+            return False
+        _ = torch.randn(1, device="cuda")
+        torch.cuda.synchronize()
+        return True
+    except Exception:
+        return False
+
+
+def create_trainer(
+    config: dict, callbacks: list, loggers, deterministic: bool, force_cpu: bool = False, force_gpu: bool = False
+) -> pl.Trainer:
     """Create a PyTorch Lightning Trainer."""
-    if torch.cuda.is_available():
+    if force_gpu and not force_cpu:
         accelerator = "gpu"
-        devices = 1
     else:
-        accelerator = "cpu"
-        devices = 1
+        accelerator = "gpu" if ((not force_cpu) and _is_gpu_usable()) else "cpu"
+    devices = 1
 
     max_steps = config["training"].get("max_steps", 8600)
     max_epochs = -1  # use max_steps only
@@ -146,8 +163,10 @@ def create_trainer(config: dict, callbacks: list, loggers, deterministic: bool) 
         "fast_dev_run": False,
         "deterministic": deterministic,
         "benchmark": not deterministic,
-        "precision": "16-mixed",
     }
+
+    # Precision: GPU のときのみ mixed-16、CPU は 32-bit
+    trainer_kwargs["precision"] = "16-mixed" if accelerator == "gpu" else "32-true"
 
     if "gradient_clip_algorithm" in config["training"]:
         trainer_kwargs["gradient_clip_algorithm"] = config["training"]["gradient_clip_algorithm"]
@@ -213,6 +232,9 @@ def main():
     parser.add_argument("--seed", type=int, help="Random seed")
     parser.add_argument("--no-deterministic", action="store_true", help="Disable deterministic mode for speed")
     parser.add_argument("--resume", type=str, help="Experiment name to resume (e.g., gatv2_20250806_162945)")
+    parser.add_argument("--cpu", action="store_true", help="Force CPU training (disable GPU even if available)")
+    parser.add_argument("--force-gpu", action="store_true", help="Force GPU (skip usability probe; may error)")
+    parser.add_argument("--num-workers", type=int, help="Override dataloader workers")
     args = parser.parse_args()
 
     # Load/merge config
@@ -243,6 +265,9 @@ def main():
         training_overrides["seed"] = args.seed
     if args.no_deterministic:
         training_overrides["deterministic"] = False
+
+    if args.num_workers is not None:
+        training_overrides["num_workers"] = int(args.num_workers)
 
     if training_overrides:
         overrides["training"] = training_overrides
@@ -299,9 +324,14 @@ def main():
     print(f"Model: {config['model']['type'].upper()}")
     print("Lexical features: enabled (default)")
 
-    if torch.cuda.is_available():
-        print(f"🚀 Using GPU: {torch.cuda.get_device_name(0)}")
-        print(f"   GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+    force_cpu = bool(args.cpu)
+    force_gpu = bool(getattr(args, "force_gpu", False))
+    if not force_cpu and (force_gpu or _is_gpu_usable()):
+        try:
+            print(f"🚀 Using GPU: {torch.cuda.get_device_name(0)}")
+            print(f"   GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+        except Exception:
+            print("🚀 Using GPU")
     else:
         print("💻 Using CPU")
 
@@ -341,7 +371,9 @@ def main():
             callbacks.append(lr_monitor)
     except Exception:
         pass
-    trainer = create_trainer(config, callbacks, loggers, deterministic)
+    trainer = create_trainer(
+        config, callbacks, loggers, deterministic, force_cpu=force_cpu and not force_gpu, force_gpu=force_gpu
+    )
 
     print("Starting training...")
 

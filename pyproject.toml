@@ -6,9 +6,18 @@ readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = { file = "LICENSE" }
 dependencies = [
-    "torch>=2.2,<2.3",
+    # GPU default (Linux, CUDA 12.8): pin Torch/vision/audio to cu128
+    "torch==2.7.0+cu128",
+    "torchvision==0.22.0+cu128",
+    "torchaudio==2.7.0+cu128",
     "pytorch-lightning>=2.0.0",
-    "torch-geometric>=2.4,<2.5",
+    # PyG core + CUDA extensions (match Torch 2.7.0 + cu128)
+    "torch-geometric>=2.5,<3.0",
+    "pyg-lib",
+    "torch-scatter",
+    "torch-sparse",
+    "torch-cluster",
+    "torch-spline-conv",
     "numpy>=1.24,<2.0",
     "pyyaml>=6.0",
     "tqdm>=4.65.0",
@@ -36,8 +45,11 @@ packages = ["mecari"]
 
 [tool.uv]
 index-url = "https://pypi.org/simple"
-# Use CUDA 12.1 compatible PyG wheels (matches torch 2.2.x + cu121 environment)
-find-links = ["https://data.pyg.org/whl/torch-2.2.0+cu121.html"]
+# Make uv sync sufficient for GPU by adding both PyTorch cu128 and PyG wheels
+find-links = [
+  "https://download.pytorch.org/whl/cu128",
+  "https://data.pyg.org/whl/torch-2.7.0+cu128.html",
+]
 
 # torch-cluster等のビルド時にtorchが必要
 [tool.uv.extra-build-dependencies]

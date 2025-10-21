@@ -41,10 +41,38 @@ The GATv2 model trained with this repository (current code and `configs/gatv2.ya
 
 - OS: Ubuntu 24.04.3 LTS (Noble Numbat)
 - Python: 3.11.3
-- PyTorch: 2.2.2+cu121
-- CUDA (runtime): 12.1 (cu121)
+- PyTorch: 2.7.0+cu128
+- CUDA (runtime): 12.8 (cu128)
 - MeCab (binary): 0.996
 - JUMANDIC: `/var/lib/mecab/dic/juman-utf8`
+
+### Project Setup (Linux + GPU, uv)
+
+```
+# 0) Install uv (if needed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 1) Create and activate a venv
+uv venv
+source .venv/bin/activate
+
+# 2) Install all dependencies (GPU-enabled)
+uv sync
+
+# 3) Verify
+python - <<'PY'
+import torch, torch_geometric as tg
+print('cuda?', torch.cuda.is_available(), 'CUDA', torch.version.cuda)
+if torch.cuda.is_available():
+  print('gpu', torch.cuda.get_device_name(0))
+print('pyg', tg.__version__)
+PY
+```
+
+Notes
+- Ensure recent NVIDIA drivers and `nvidia-smi` are present.
+- If you see wheel resolution errors, ensure your environment has network access to both PyPI and the configured find-links (PyTorch cu128 and PyG wheels).
+- Torch 2.8 alternative requires relaxing `pyproject.toml` to `torch>=2.7,<2.9` and updating the PyG `find-links` to `torch-2.8.0+cu128.html`.
 
 ### MeCab Setup (Ubuntu 24.04)
 1) Install packages (includes the JUMANDIC dictionary)
@@ -61,17 +89,7 @@ mecab -v                       # e.g., mecab of 0.996
 test -d /var/lib/mecab/dic/juman-utf8 && echo "JUMANDIC OK"
 ```
 
-### Project Setup
-
-```bash
-# Install uv if needed
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Create venv and install dependencies
-uv venv
-source .venv/bin/activate
-uv sync
-```
+ 
 
 ## Quickstart (Morphological analysis)
 
@@ -115,6 +133,9 @@ python train.py --config configs/gatv2.yaml
 
 - Outputs are saved under `experiments/<name>/`.
 - The bundled model was trained with the current codebase and configuration (`configs/gatv2.yaml`).
+
+Troubleshooting
+- If `torch.load` throws a "Weights only load failed" error when reading `annotations/*.pt`, use Torch 2.7/2.8 or pass `weights_only=False` in your local environment. This happens since Torch 2.6 changed the default of `weights_only` to True.
 
 ### Evaluation
 
